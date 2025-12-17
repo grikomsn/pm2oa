@@ -41,7 +41,14 @@ program
       }
 
       // Parse the collection JSON
-      const collection = JSON.parse(collectionData);
+      let collection;
+      try {
+        collection = JSON.parse(collectionData);
+      } catch (parseError) {
+        throw new Error(
+          `Invalid JSON format in collection data: ${parseError instanceof Error ? parseError.message : String(parseError)}`
+        );
+      }
 
       // Convert to OpenAPI
       const openApiSpec = transpile(collection);
