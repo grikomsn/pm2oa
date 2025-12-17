@@ -1,10 +1,20 @@
 {
   "name": "pm2oa",
+  "version": "1.0.0",
+  "description": "postman2openapi CLI",
   "module": "index.ts",
   "type": "module",
-  "private": true,
+  "bin": {
+    "pm2oa": "./index.ts"
+  },
+  "dependencies": {
+    "commander": "^12.1.0",
+    "js-yaml": "^4.1.1",
+    "postman2openapi": "^1.2.1"
+  },
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "@types/js-yaml": "^4.0.9"
   },
   "peerDependencies": {
     "typescript": "^5"
