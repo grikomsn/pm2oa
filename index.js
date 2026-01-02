@@ -5,10 +5,14 @@ import { transpile } from "postman2openapi";
 import { readFileSync, writeFileSync } from "fs";
 import * as yaml from "js-yaml";
 
-if (typeof fetch !== "function") {
+const nodeMajor = Number(process.versions.node.split(".")[0]);
+if (nodeMajor < 18 || typeof fetch !== "function") {
   console.error("pm2oa requires Node.js 18+ with built-in fetch available.");
   process.exit(1);
 }
+
+const formatError = (error) =>
+  error instanceof Error ? error.message : String(error);
 
 const program = new Command();
 
@@ -51,7 +55,7 @@ program
         collection = JSON.parse(collectionData);
       } catch (parseError) {
         throw new Error(
-          `Invalid JSON format in collection data: ${parseError instanceof Error ? parseError.message : String(parseError)}`
+          `Invalid JSON format in collection data: ${formatError(parseError)}`
         );
       }
 
@@ -74,10 +78,7 @@ program
         console.log(output);
       }
     } catch (error) {
-      console.error(
-        "Error:",
-        error instanceof Error ? error.message : String(error)
-      );
+      console.error("Error:", formatError(error));
       process.exit(1);
     }
   });
