@@ -2,7 +2,6 @@
   "name": "pm2oa",
   "version": "1.0.0",
   "description": "postman2openapi CLI",
-  "main": "./index.js",
   "type": "module",
   "bin": {
     "pm2oa": "./index.js"

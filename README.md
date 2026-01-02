@@ -2,7 +2,7 @@
 
 A lightweight CLI tool to convert Postman collections to OpenAPI specifications using [postman2openapi](https://github.com/kevinswiber/postman2openapi).
 
-Requires Node.js 18+ (for built-in `fetch` support).
+Requires Node.js 18+ (for built-in `fetch` and ESM support).
 
 ## Installation
 
