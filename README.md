@@ -2,10 +2,12 @@
 
 A lightweight CLI tool to convert Postman collections to OpenAPI specifications using [postman2openapi](https://github.com/kevinswiber/postman2openapi).
 
+Requires Node.js 18+ (for built-in `fetch` support).
+
 ## Installation
 
 ```bash
-bunx pm2oa
+npx pm2oa
 ```
 
 ## Usage
@@ -13,31 +15,31 @@ bunx pm2oa
 ### Convert from URL
 
 ```bash
-bunx pm2oa https://some.postman.spec/
+npx pm2oa https://some.postman.spec/
 ```
 
 ### Convert from URL to specific output file
 
 ```bash
-bunx pm2oa https://some.postman.spec/ -o output.yml
+npx pm2oa https://some.postman.spec/ -o output.yml
 ```
 
 ### Convert from local JSON file
 
 ```bash
-bunx pm2oa postman-spec.json
+npx pm2oa postman-spec.json
 ```
 
 ### Convert from stdin
 
 ```bash
-cat postman-spec.json | bunx pm2oa
+cat postman-spec.json | npx pm2oa
 ```
 
 or
 
 ```bash
-bunx pm2oa < postman-spec.json
+npx pm2oa < postman-spec.json
 ```
 
 ## Output Formats
@@ -51,4 +53,3 @@ bunx pm2oa < postman-spec.json
 - `-o, --output <file>` - Output file path (defaults to stdout)
 - `-h, --help` - Display help information
 - `-V, --version` - Display version number
-

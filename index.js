@@ -1,4 +1,4 @@
-#!/usr/bin/env bun
+#!/usr/bin/env node
 
 import { Command } from "commander";
 import { transpile } from "postman2openapi";
@@ -15,7 +15,7 @@ program
   .option("-o, --output <file>", "Output file path (defaults to stdout)")
   .action(async (input, options) => {
     try {
-      let collectionData: string;
+      let collectionData;
 
       // Handle different input sources
       if (input) {
@@ -33,7 +33,7 @@ program
         }
       } else {
         // Read from stdin
-        const chunks: Buffer[] = [];
+        const chunks = [];
         for await (const chunk of process.stdin) {
           chunks.push(chunk);
         }
@@ -54,7 +54,7 @@ program
       const openApiSpec = transpile(collection);
 
       // Determine output format based on file extension
-      let output: string;
+      let output;
       if (options.output && (options.output.endsWith(".yml") || options.output.endsWith(".yaml"))) {
         output = yaml.dump(openApiSpec, { indent: 2, lineWidth: -1 });
       } else {
