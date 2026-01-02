@@ -4,6 +4,7 @@ import { Command } from "commander";
 import { transpile } from "postman2openapi";
 import { readFileSync, writeFileSync } from "fs";
 import * as yaml from "js-yaml";
+import pkg from "./package.json" with { type: "json" };
 
 if (typeof globalThis.fetch !== "function") {
   console.error("pm2oa requires a runtime with fetch available (Node.js 18+ or a compatible polyfill).");
@@ -18,7 +19,7 @@ const program = new Command();
 program
   .name("pm2oa")
   .description("Convert Postman collections to OpenAPI specifications")
-  .version("1.0.0")
+  .version(pkg.version)
   .argument("[input]", "Input file path or URL to Postman collection")
   .option("-o, --output <file>", "Output file path (defaults to stdout)")
   .action(async (input, options) => {
@@ -42,8 +43,14 @@ program
       } else {
         // Read from stdin
         const chunks = [];
-        for await (const chunk of process.stdin) {
-          chunks.push(chunk);
+        try {
+          for await (const chunk of process.stdin) {
+            chunks.push(chunk);
+          }
+        } catch (stdinError) {
+          throw new Error(
+            `Failed to read from stdin: ${formatError(stdinError)}`
+          );
         }
         collectionData = Buffer.concat(chunks).toString("utf-8");
       }
