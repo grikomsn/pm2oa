@@ -5,8 +5,8 @@ import { transpile } from "postman2openapi";
 import { readFileSync, writeFileSync } from "fs";
 import * as yaml from "js-yaml";
 
-if (typeof fetch !== "function") {
-  console.error("pm2oa requires Node.js 18+ with built-in fetch available.");
+if (typeof globalThis.fetch !== "function") {
+  console.error("pm2oa requires a runtime with fetch available (Node.js 18+ or a compatible polyfill).");
   process.exit(1);
 }
 
