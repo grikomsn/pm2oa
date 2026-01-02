@@ -5,14 +5,13 @@ import { transpile } from "postman2openapi";
 import { readFileSync, writeFileSync } from "fs";
 import * as yaml from "js-yaml";
 
-const nodeMajor = parseInt(process.versions?.node?.match(/^(\d+)/)?.[1] ?? "0", 10);
-if (nodeMajor < 18 || typeof fetch !== "function") {
+if (typeof fetch !== "function") {
   console.error("pm2oa requires Node.js 18+ with built-in fetch available.");
   process.exit(1);
 }
 
 const formatError = (error) =>
-  error instanceof Error ? error.message || error.toString() : String(error);
+  error instanceof Error ? error.message : String(error);
 
 const program = new Command();
 
