@@ -5,7 +5,7 @@ import { transpile } from "postman2openapi";
 import { readFileSync, writeFileSync } from "fs";
 import * as yaml from "js-yaml";
 
-const nodeMajor = Number(process.versions.node.split(".")[0]);
+const nodeMajor = parseInt(process.versions?.node?.split(".")[0] ?? "0", 10);
 if (nodeMajor < 18 || typeof fetch !== "function") {
   console.error("pm2oa requires Node.js 18+ with built-in fetch available.");
   process.exit(1);
@@ -64,8 +64,13 @@ program
 
       // Determine output format based on file extension
       let output;
-      if (options.output && (options.output.endsWith(".yml") || options.output.endsWith(".yaml"))) {
-        output = yaml.dump(openApiSpec, { indent: 2, lineWidth: -1 });
+      if (options.output) {
+        const outputPath = options.output.toLowerCase();
+        if (outputPath.endsWith(".yml") || outputPath.endsWith(".yaml")) {
+          output = yaml.dump(openApiSpec, { indent: 2, lineWidth: -1 });
+        } else {
+          output = JSON.stringify(openApiSpec, null, 2);
+        }
       } else {
         output = JSON.stringify(openApiSpec, null, 2);
       }
