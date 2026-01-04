@@ -149,3 +149,5 @@
 148. Before publishing, run `npm test`, `npm run lint`, and optionally `npm pack`.
 149. If adding new commands, update this file and README simultaneously.
 150. When unsure, favor minimal change that preserves current behavior.
+151. Publishing relies on `.github/workflows/publish.yml`, which runs `npm ci`, lint, tests, and `npm publish --access public --provenance` after a release or manual trigger.
+152. Ensure the `NPM_TOKEN` repository secret is provisioned so the workflow can authenticate as `NODE_AUTH_TOKEN`, and keep the workflow docs in sync with README.

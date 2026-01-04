@@ -65,3 +65,9 @@ npx pm2oa < postman-spec.json
 
 - `npm run lint` – Syntax check `index.js`
 - `npm test` – Smoke test JSON and YAML outputs against a fixture
+
+## Publishing
+
+- Releases run the `.github/workflows/publish.yml` workflow (triggered on release publish and manually via `workflow_dispatch`).
+- The workflow executes `npm ci`, then `npm run lint` / `npm test`, and finally `npm publish --access public --provenance` with the `NPM_TOKEN` repository secret supplied as `NODE_AUTH_TOKEN`.
+- Keep versions bumped before invoking the workflow and verify tests/lint pass locally (`npm run lint`, `npm test`, optionally `npm pack`) so the pipeline can succeed without intervention.
