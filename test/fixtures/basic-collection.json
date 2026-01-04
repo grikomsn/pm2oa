@@ -1,0 +1,20 @@
+{
+  "info": {
+    "name": "Sample Collection",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Hello World",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "https://example.com/hello",
+          "protocol": "https",
+          "host": ["example", "com"],
+          "path": ["hello"]
+        }
+      }
+    }
+  ]
+}

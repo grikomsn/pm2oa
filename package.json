@@ -9,6 +9,10 @@
   "engines": {
     "node": ">=18"
   },
+  "scripts": {
+    "lint": "node --check index.js",
+    "test": "node test/smoke.mjs"
+  },
   "dependencies": {
     "commander": "^12.1.0",
     "js-yaml": "^4.1.1",
@@ -23,6 +27,11 @@
     "type": "git",
     "url": "https://github.com/grikomsn/pm2oa.git"
   },
+  "files": [
+    "index.js",
+    "LICENSE",
+    "README.md"
+  ],
   "keywords": [
     "postman",
     "openapi",

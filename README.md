@@ -2,7 +2,7 @@
 
 A lightweight CLI tool to convert Postman collections to OpenAPI specifications using [postman2openapi](https://github.com/kevinswiber/postman2openapi).
 
-This package targets Node.js 18+ because it relies on the built-in `fetch` API (no polyfill included).
+This package targets Node.js 18+ because it relies on the built-in `fetch` API (no polyfill included). Ensure `fetch` is available when running in custom environments.
 
 ## Installation
 
@@ -30,6 +30,12 @@ npx pm2oa https://some.postman.spec/ -o output.yml
 npx pm2oa postman-spec.json
 ```
 
+### Force YAML output regardless of extension
+
+```bash
+npx pm2oa postman-spec.json --format yaml
+```
+
 ### Convert from stdin
 
 ```bash
@@ -45,11 +51,17 @@ npx pm2oa < postman-spec.json
 ## Output Formats
 
 - **JSON** (default): Outputs OpenAPI specification as JSON
-- **YAML**: Automatically detected when output file ends with `.yml` or `.yaml`
+- **YAML**: Use `--format yaml` or an output path ending with `.yml` or `.yaml`
 
 ## Options
 
-- `[input]` - Input file path or URL to Postman collection (optional, reads from stdin if not provided)
+- `[input]` - Input file path or URL to Postman collection (optional; errors when stdin is empty)
 - `-o, --output <file>` - Output file path (defaults to stdout)
+- `-f, --format <format>` - Output format (`json` or `yaml`)
 - `-h, --help` - Display help information
 - `-V, --version` - Display version number
+
+## Development
+
+- `npm run lint` – Syntax check `index.js`
+- `npm test` – Smoke test JSON and YAML outputs against a fixture

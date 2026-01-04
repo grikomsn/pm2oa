@@ -4,7 +4,10 @@ import { Command } from "commander";
 import { transpile } from "postman2openapi";
 import { readFileSync, writeFileSync } from "fs";
 import * as yaml from "js-yaml";
-import pkg from "./package.json" with { type: "json" };
+
+const pkg = JSON.parse(
+  readFileSync(new URL("./package.json", import.meta.url), "utf-8")
+);
 
 if (typeof globalThis.fetch !== "function") {
   console.error("pm2oa requires a runtime with fetch available (Node.js 18+ or a compatible polyfill).");
@@ -22,18 +25,23 @@ program
   .version(pkg.version)
   .argument("[input]", "Input file path or URL to Postman collection")
   .option("-o, --output <file>", "Output file path (defaults to stdout)")
+  .option("-f, --format <format>", "Output format (json|yaml)")
   .action(async (input, options) => {
     try {
       let collectionData;
 
+      const hasInputArgument = Boolean(input);
+
       // Handle different input sources
-      if (input) {
+      if (hasInputArgument) {
         // Check if input is a URL
         if (input.startsWith("http://") || input.startsWith("https://")) {
           // Fetch from URL
           const response = await fetch(input);
           if (!response.ok) {
-            throw new Error(`Failed to fetch from URL: ${response.statusText}`);
+            throw new Error(
+              `Failed to fetch from URL: ${response.status} ${response.statusText}`
+            );
           }
           collectionData = await response.text();
         } else {
@@ -41,6 +49,12 @@ program
           collectionData = readFileSync(input, "utf-8");
         }
       } else {
+        if (process.stdin.isTTY) {
+          throw new Error(
+            "No input provided. Provide a file/URL or pipe a Postman collection via stdin."
+          );
+        }
+
         // Read from stdin
         const chunks = [];
         try {
@@ -52,7 +66,18 @@ program
             `Failed to read from stdin: ${formatError(stdinError)}`
           );
         }
+
+        if (chunks.length === 0) {
+          throw new Error(
+            "No input provided. Provide a file/URL or pipe a Postman collection via stdin."
+          );
+        }
+
         collectionData = Buffer.concat(chunks).toString("utf-8");
+      }
+
+      if (!collectionData || collectionData.toString().trim() === "") {
+        throw new Error("Input is empty. Provide valid Postman collection JSON.");
       }
 
       // Parse the collection JSON
@@ -68,15 +93,23 @@ program
       // Convert to OpenAPI
       const openApiSpec = transpile(collection);
 
-      // Determine output format based on file extension
+      const formatFlag = options.format?.toLowerCase();
+      if (formatFlag && formatFlag !== "json" && formatFlag !== "yaml") {
+        throw new Error("Invalid format. Use \"json\" or \"yaml\".");
+      }
+
+      const outputPath = options.output ? options.output.toLowerCase() : "";
+      const formatFromExtension = outputPath.endsWith(".yml") || outputPath.endsWith(".yaml")
+        ? "yaml"
+        : outputPath.endsWith(".json")
+          ? "json"
+          : undefined;
+
+      const outputFormat = formatFlag ?? formatFromExtension ?? "json";
+
       let output;
-      if (options.output) {
-        const outputPath = options.output.toLowerCase();
-        if (outputPath.endsWith(".yml") || outputPath.endsWith(".yaml")) {
-          output = yaml.dump(openApiSpec, { indent: 2, lineWidth: -1 });
-        } else {
-          output = JSON.stringify(openApiSpec, null, 2);
-        }
+      if (outputFormat === "yaml") {
+        output = yaml.dump(openApiSpec, { indent: 2, lineWidth: -1 });
       } else {
         output = JSON.stringify(openApiSpec, null, 2);
       }
