@@ -2,6 +2,8 @@
 
 A lightweight CLI tool to convert Postman collections to OpenAPI specifications using [postman2openapi](https://github.com/kevinswiber/postman2openapi).
 
+Published on npm: https://www.npmjs.com/package/pm2oa
+
 This package targets Node.js 18+ because it relies on the built-in `fetch` API (no polyfill included). Ensure `fetch` is available when running in custom environments.
 
 ## Installation
