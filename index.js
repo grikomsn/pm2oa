@@ -1,21 +1,30 @@
-#!/usr/bin/env bun
+#!/usr/bin/env node
 
 import { Command } from "commander";
 import { transpile } from "postman2openapi";
 import { readFileSync, writeFileSync } from "fs";
 import * as yaml from "js-yaml";
+import pkg from "./package.json" with { type: "json" };
+
+if (typeof globalThis.fetch !== "function") {
+  console.error("pm2oa requires a runtime with fetch available (Node.js 18+ or a compatible polyfill).");
+  process.exit(1);
+}
+
+const formatError = (error) =>
+  error instanceof Error ? error.message : String(error);
 
 const program = new Command();
 
 program
   .name("pm2oa")
   .description("Convert Postman collections to OpenAPI specifications")
-  .version("1.0.0")
+  .version(pkg.version)
   .argument("[input]", "Input file path or URL to Postman collection")
   .option("-o, --output <file>", "Output file path (defaults to stdout)")
   .action(async (input, options) => {
     try {
-      let collectionData: string;
+      let collectionData;
 
       // Handle different input sources
       if (input) {
@@ -33,9 +42,15 @@ program
         }
       } else {
         // Read from stdin
-        const chunks: Buffer[] = [];
-        for await (const chunk of process.stdin) {
-          chunks.push(chunk);
+        const chunks = [];
+        try {
+          for await (const chunk of process.stdin) {
+            chunks.push(chunk);
+          }
+        } catch (stdinError) {
+          throw new Error(
+            `Failed to read from stdin: ${formatError(stdinError)}`
+          );
         }
         collectionData = Buffer.concat(chunks).toString("utf-8");
       }
@@ -46,7 +61,7 @@ program
         collection = JSON.parse(collectionData);
       } catch (parseError) {
         throw new Error(
-          `Invalid JSON format in collection data: ${parseError instanceof Error ? parseError.message : String(parseError)}`
+          `Invalid JSON format in collection data: ${formatError(parseError)}`
         );
       }
 
@@ -54,9 +69,14 @@ program
       const openApiSpec = transpile(collection);
 
       // Determine output format based on file extension
-      let output: string;
-      if (options.output && (options.output.endsWith(".yml") || options.output.endsWith(".yaml"))) {
-        output = yaml.dump(openApiSpec, { indent: 2, lineWidth: -1 });
+      let output;
+      if (options.output) {
+        const outputPath = options.output.toLowerCase();
+        if (outputPath.endsWith(".yml") || outputPath.endsWith(".yaml")) {
+          output = yaml.dump(openApiSpec, { indent: 2, lineWidth: -1 });
+        } else {
+          output = JSON.stringify(openApiSpec, null, 2);
+        }
       } else {
         output = JSON.stringify(openApiSpec, null, 2);
       }
@@ -69,10 +89,7 @@ program
         console.log(output);
       }
     } catch (error) {
-      console.error(
-        "Error:",
-        error instanceof Error ? error.message : String(error)
-      );
+      console.error("Error:", formatError(error));
       process.exit(1);
     }
   });
